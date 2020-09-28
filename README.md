@@ -4,6 +4,8 @@ A very simple HTTP echo server with support for websockets.
 
 ## Behavior
 - Any messages sent from a websocket client are echoed
+- Pass `delay` parameter in seconds to simulate slow response
+- Visit `/ip` to get the network address that sent the request
 - Visit `/.ws` for a basic UI to connect and send websocket messages
 - Requests to any other URL will return the request headers and body
 

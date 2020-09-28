@@ -8,6 +8,8 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"strconv"
+	"time"
 
 	"github.com/gorilla/websocket"
 	"golang.org/x/net/http2"
@@ -62,12 +64,22 @@ func handler(wr http.ResponseWriter, req *http.Request) {
 		fmt.Printf("%s | %s %s\n", req.RemoteAddr, req.Method, req.URL)
 	}
 
+	q := req.URL.Query()
+	if len(q["delay"]) > 0 {
+		delay, err := strconv.Atoi(q["delay"][0])
+		if err == nil {
+			time.Sleep(time.Duration(delay) * time.Second)
+		}
+	}
+
 	if websocket.IsWebSocketUpgrade(req) {
 		serveWebSocket(wr, req)
 	} else if req.URL.Path == "/.ws" {
 		wr.Header().Add("Content-Type", "text/html")
 		wr.WriteHeader(200)
 		io.WriteString(wr, websocketHTML)
+	} else if req.URL.Path == "/ip" {
+		serveIP(wr, req)
 	} else {
 		serveHTTP(wr, req)
 	}
@@ -118,6 +130,14 @@ func serveWebSocket(wr http.ResponseWriter, req *http.Request) {
 	if err != nil {
 		fmt.Printf("%s | %s\n", req.RemoteAddr, err)
 	}
+}
+
+func serveIP(wr http.ResponseWriter, req *http.Request) {
+	wr.Header().Add("Content-Type", "text/plain")
+	wr.WriteHeader(200)
+
+	fmt.Fprintln(wr, req.RemoteAddr)
+	io.Copy(wr, req.Body)
 }
 
 func serveHTTP(wr http.ResponseWriter, req *http.Request) {

@@ -15,6 +15,7 @@ spec:
       containers:
       - image: shurikk/echo-server
         name: service
+        imagePullPolicy: Always
         ports:
         - containerPort: 8080
         resources:

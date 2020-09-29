@@ -136,7 +136,18 @@ func serveIP(wr http.ResponseWriter, req *http.Request) {
 	wr.Header().Add("Content-Type", "text/plain")
 	wr.WriteHeader(200)
 
-	fmt.Fprintln(wr, req.RemoteAddr)
+	IPAddress := req.Header.Get("X-Real-Ip")
+
+	if IPAddress == "" {
+		IPAddress = req.Header.Get("X-Forwarded-For")
+	}
+
+	if IPAddress == "" {
+		IPAddress = req.RemoteAddr
+	}
+
+	fmt.Fprintln(wr, IPAddress)
+
 	io.Copy(wr, req.Body)
 }
 

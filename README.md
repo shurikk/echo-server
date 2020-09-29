@@ -39,3 +39,9 @@ To run as a service:
 ```
 docker service create --publish 10000:8080 jmalloc/echo-server
 ```
+
+### Running on Kubernetes
+
+```
+kubectl apply -f kubernetes/echo-server.yml
+```
